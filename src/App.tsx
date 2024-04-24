@@ -7,54 +7,60 @@ import {
   useNavigate,
 } from "react-router-dom";
 import SiteLayout from "./layouts/site";
-import HomePage from "./pages/home";
-import LoginPage from "./pages/login";
 import { useUser } from "./hooks/useUser";
-import { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import DashboardLayout from "./layouts/dashboard";
-import TransactionsPage from "./pages/dashboard/transactions";
 import DashobardHeader from "./components/Dashboard/Header";
-import NotFoundPage from "./pages/not-found";
+import PageLoadingIndicator from "./components/PageLoadingIndicator";
+
+const HomePage = React.lazy(() => import("./pages/home"));
+const LoginPage = React.lazy(() => import("./pages/login"));
+const TransactionsPage = React.lazy(
+  () => import("./pages/dashboard/transactions")
+);
+const NotFoundPage = React.lazy(() => import("./pages/not-found"));
 
 const App = () => {
   return (
     <UserProvider>
-      <Routes>
-        <Route path="/" element={<SiteLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="about" element={<h1>About</h1>} />
-        </Route>
+      <Suspense fallback={<PageLoadingIndicator />}>
+        <Routes>
+          <Route path="/" element={<SiteLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="about" element={<h1>About</h1>} />
+          </Route>
 
-        <Route
-          path="/login"
-          element={
-            <AuthWrapper>
-              <LoginPage />
-            </AuthWrapper>
-          }
-        />
-
-        <Route
-          path="/dashboard"
-          element={
-            <RequireAuth>
-              <DashboardLayout />
-            </RequireAuth>
-          }>
           <Route
-            index
+            path="/login"
             element={
-              <DashobardHeader
-                heading="Dashboard"
-                description="Your private Dashboard"
-              />
+              <AuthWrapper>
+                <LoginPage />
+              </AuthWrapper>
             }
           />
-          <Route path="transactions" element={<TransactionsPage />} />
-        </Route>
 
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          <Route
+            path="/dashboard"
+            element={
+              <RequireAuth>
+                <DashboardLayout />
+              </RequireAuth>
+            }>
+            <Route
+              index
+              element={
+                <DashobardHeader
+                  heading="Dashboard"
+                  description="Your private Dashboard"
+                />
+              }
+            />
+            <Route path="transactions" element={<TransactionsPage />} />
+          </Route>
+
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
     </UserProvider>
   );
 };
