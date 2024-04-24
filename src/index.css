@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Millik";
+    src: url("./assets//fonts/millik/millikdemoversion.otf") format("opentype");
+  }
+
+  html {
+    font-family: "Red Hat Display Variable", system-ui, sans-serif;
+  }
+}
